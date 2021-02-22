@@ -81,9 +81,9 @@ WSGI_APPLICATION = 'tour.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'tour',
+        'NAME': 'name_created_in the_postgresql',
         'USER': 'postgres',
-        'PASSWORD': 'franodex',
+        'PASSWORD': 'your_password',
         'HOST':'localhost',
         'PORT':'5432',
     }
