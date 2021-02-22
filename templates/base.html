@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+
+{% load leaflet_tags %}
+
+<html>
+<head>
+
+<!-- loading leaflet from django-leaflet -->
+
+{% leaflet_js %}
+{% leaflet_css %}
+
+	<title>{% block title %}
+	{% endblock %} | tour guide </title>
+
+<!-- stle -->
+
+{% include 'style.html' %}
+
+<!-- css -->
+
+{% include 'css.html' %}
+
+</head>
+
+<body>
+
+	<!-- for content  -->
+
+{% block content %}
+
+
+{% endblock content %}
+
+
+
+<!-- geolocation -->
+
+{% include 'geolocate.html' %}
+
+</body>
+		<script>
+			
+			var newMarker = new L.marker(e.latlng).addTo(map);
+
+		</script>
+
+{% leaflet_map "gis" callback="window.our_layers" %}
+
+<!-- scripts -->
+{% include 'scripts.html' %}
+
+<!-- Javascript codes -->
+
+{% block javascripts %}
+
+{% endblock javascripts %}
+
+</html>

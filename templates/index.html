@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %} Nyeri {% endblock title %}
+
+{% block content %}
+
+<h1>NYERI TOUR GUIDE NAVIGATION SYSTEM</h1>
+
+
+<a href="{% url 'home' %}" style="padding: 20px; text-decoration: none; color:#000000;">HOME</a>
+
+<a href="{% url 'admin:index' %}" style="text-decoration: none; color:#000000;">BOOK A HOTEL</a>
+
+<hr>
+
+{% endblock content %}
+
+<!-- scripts -->
+
+{% block javascripts %}
+
+<script>
+	function our_layers(map,options){
+
+// layers
+
+		// open street map  tile layer
+		var osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {});
+		// Esri World Imagery Service
+
+		var esri= L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{});
+
+// data from backend
+
+		var county = new L.GeoJSON.AJAX("{% url 'county' %}",{
+			// added style for county
+
+                            style: function colors(feature){
+                                return{
+                                    fillOpacity:0,
+                                    weight: 2,
+                                    opacity: 0.8,
+                                    color: 'black',
+                                    
+                                };
+                            },
+		});
+		county.addTo(map);
+
+
+// data for tourists site 
+
+		var lodge = new L.GeoJSON.AJAX("{% url 'lodge' %}",{
+
+			// modification
+
+			pointToLayer: function (feature, latlng) {
+				return L.marker(latlng, {
+					icon: L.icon({
+						iconUrl: 'static/images/motel.png',
+						iconSize: [20,20],
+								})
+						    })
+						},
+
+			// table attribute
+
+            onEachFeature:function(feature,layer){
+                if(feature.properties){
+                    var content="<table>" +"<tr><th>Hotel :</th><td>" + feature.properties.name  + "</td></tr>"+"<table>";
+
+                        layer.on({
+                            click: function (e) {
+                            	layer.bindPopup(content).openPopup(e.latlng);
+                                        }
+                                    });
+
+
+                                }
+                            },
+		});
+		
+
+//national parks
+		var park = new L.GeoJSON.AJAX("{% url 'park' %}",{
+
+			// style
+
+			style: function colors(feature){
+                                return{
+                                    fillOpacity:0.5,
+                                    weight: 2,
+                                    opacity: 0.8,
+                                    color: 'green',
+                                    
+                                };
+                            },
+
+            onEachFeature:function(feature,layer){
+                if(feature.properties){
+                    var content="<table class='table table-striped table-bordered table-condensed'>" +"<tr><th>Name :</th><td>" + feature.properties.areaname + "</td></tr>" + "<tr><th>Site Code:</th><td>" + feature.properties.site_code+ "</td></tr>"+"<table>";
+
+                        layer.on({
+                            click: function (e) {
+                            	layer.bindPopup(content).openPopup(e.latlng);
+                                        }
+                                    });
+
+
+                                }
+                            },
+			
+
+		});
+
+// airstrip
+
+		var airstrip =new L.GeoJSON.AJAX("{% url 'airstrip' %}",{
+
+		// style for floods
+
+			pointToLayer: function (feature, latlng) {
+				return L.marker(latlng, {
+					icon: L.icon({
+						iconUrl: 'static/images/airport.png',
+						iconSize: [40,40],
+								})
+						    })
+						},
+
+		});
+
+// layers
+		var baseLayers={
+		    "Open Street Map":osm,
+			"Satellite Imagery": esri
+			
+				}
+		var groupedOverlays = {
+			"Layers":{
+				"county": county,
+				    			
+				  	},
+
+			"Services":{
+				"Lodge and Hotel": lodge,
+				"National Parks": park,
+				"Airstrip" : airstrip,
+			
+				  	}
+				  				
+		};
+			
+
+		L.control.groupedLayers(baseLayers,groupedOverlays).addTo(map);
+
+		
+// routing
+		L.Routing.control( {
+			waypoints:[
+				L.latLng(-0.3800, 36.9580),
+				L.latLng(-0.5623, 37.13)
+									]
+			}).addTo(map);
+		
+
+// // search
+
+// 		var controlSearch = new L.Control.Search({
+// 		    position:'topleft',    // where do you want the search bar
+// 		    layer: county,  // name of the layer
+// 		    initial: false,
+// 		    zoom: 11,        // set zoom to found location when searched
+// 		    marker: false,
+// 		    textPlaceholder: 'search...' // placeholder while nothing is searched
+  			
+//   		}).addTo(map);
+	   
+// legend
+
+		// var legend = L.control.legend({
+  //           items: [
+  //               {color: 'red', label: 'county'},
+  //               {color: 'blue', label: 'not reserved'}
+  //           ],
+  //           collapsed: false
+  //       }).addTo(map);
+
+
+// geoserach
+
+		// you want to get it of the window global
+
+		var search = new GeoSearch.GeoSearchControl({
+
+  			provider: new GeoSearch.EsriProvider(),
+
+  			 params: {
+			    email: 'franodex10@gmail.com',
+			    'accept-language': 'Br', // render results in british
+			    countrycodes: 'ken', // limit search results 
+			    addressdetails: 1, // include additional address detail parts
+			  },
+
+
+			});
+		map.addControl(search);
+
+
+
+// geolocation
+
+
+		
+
+	}
+</script>
+
+
+
+{% endblock javascripts %}
